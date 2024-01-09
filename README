@@ -16,9 +16,7 @@ in the directory (in which case a not found message is printed). The client
 also can open a new output file and print future queries to that file.  
 
 Acknowledgements:
-We looked through our previous FunkeyTable lab for guidance of how to implement
-a chaining table and expanding the table once we've exceeded the load factor. 
-Additionally, we used the cplusplus website to get a better understanding of
+We used the cplusplus website to get a better understanding of
 the std::functional, input and output streams, and making strings to lowercase.
 
 Files:
