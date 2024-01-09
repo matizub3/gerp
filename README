@@ -1,0 +1,194 @@
+Project 4: Gerp
+CS15 
+Rolando Ortega and Mateusz Zubrzycki 
+12/11/23
+
+Purpose:
+This program is an implementation of gerp, which allows clients to search for 
+all of the locations of a given case sensitive or case insensitive word in a
+directory. The program firsts builds an index with all of the words in the 
+directory and their unique locations in the directory, treating two words that
+are spelled the same but with different capitalization of letters separately. 
+The program then allows clients to query words, either searching with case 
+sensitive or disregarding differently capitalizaed words. The results of these
+queries are printed to an output file, including when the word is not found
+in the directory (in which case a not found message is printed). The client 
+also can open a new output file and print future queries to that file.  
+
+Acknowledgements:
+We looked through our previous FunkeyTable lab for guidance of how to implement
+a chaining table and expanding the table once we've exceeded the load factor. 
+Additionally, we used the cplusplus website to get a better understanding of
+the std::functional, input and output streams, and making strings to lowercase.
+
+Files:
+  main.cpp: the driver file, which creates a new gerp for the client and runs 
+  the query loop. 
+
+  gerp.h: the interface of the gerp class
+
+  gerp.cpp: the implementation of the gerp class
+
+  hashTable.h: the interface of the hashTable class
+
+  hashTable.cpp: the implementation of the hashTable class
+
+  stringProcessing.h: the interface of the stripNonAlphaNum function
+
+  stringProcessing.cpp: the implementation of the stripNonAlphaNum function
+
+  FSTree.h: the interface of the FSTree class
+
+  FSTree.cpp: the implementation of the FSTree class
+
+  DirNode.h: the interface of the DirNode class
+
+  DirNode.cpp: the implementation of the DirNode class 
+
+  unit_tests.h: tests for the functions of the hashTable class 
+
+  README: this file, includes, general information about the program
+
+  diff_tests.txt: diff tests for the gerp class and overall program
+
+Compile & Run:
+  - Compile using make gerp
+  - run using executable ./gerp, with the name of an input directory and the 
+    name of an output file. 
+
+    ./gerp [directory] [output file]
+
+Architectural Overview: 
+When implementing our hash table, we used several structs to store data about 
+the directory. For the hash table, we defined our key has the all lowercase 
+version of a word and our value has specific, case sensitive versions of that
+word with a list of unique locations in our directory. Following these 
+defintions, we first created a struct called Bucket. Bucket structs contain all 
+of the keys in our table that have the same hash index; these are stored in a 
+vector in each Bucket. The vectors are of our second struct, Nodes. Each Node 
+struct corresponds to a lowercase key in our directory, and contains a vector 
+of all of the case sensitive versions of that key. 
+
+These case sensitive words are stored in WordLocations structs, which each 
+correspond to a unique case sensitive word in our directory and contain a vector
+of all of the unique locations of that word. For example, the words "the" and 
+"THE" would each be stored in their own WordLocations struct, and those structs 
+would be stored in the vector of the "the" Node. Finally, our last struct is 
+Instance. Each Instance represents a specific location in our directory. A 
+location is a file in the directory, represented by an index in gerp's vector of
+file paths, and a line number in that file. 
+
+Our implementation of the hash table contains an array of Bucket structs that
+stores all of this information. This, combined with the C++ hash function, 
+gives us the ability to insert and access words and locations in our hash table.
+The hash table is used as our index for storing information about the words in
+our input directory. Thus, it directly interacts with our gerp class, which
+processes the contents of the directory into our hash table before it responds
+to queries and accesses words in the hash table based on case sensitivity.
+The implementation for gerp also relies on FSTree to build a file system tree
+of all of the subdirectories and files in our directory, DirNode to access
+the elements in the tree when building our index, and stringProcessing to 
+ensure our words are properly formatted with no leading or trailing non
+alpha numeric characters before inserting and querying. 
+
+Data structures & Algorithms:
+Our gerp program uses a variety of data structures to achieve our goals. The 
+key data structure that we utilized was our hash table of words. Each word has
+its all lowercase version as it's key, while it's value is itself and a list
+of all of its unique locations in the directory. The index of each word was 
+produced using the hash function provided by C++, making sure that the word was 
+all lowercase before running it through the hash function. Using a hash table 
+ensured that we have, on average, instaneous insertion and access for each word 
+in the directory, which is especially crucial when dealing with larger and 
+larger directories. While potential disadvanatges to using a hash table such 
+as comparisions and ordering do exist, this was not a concern for us as we 
+were not utilzing these operations in our program 
+
+One potential problem is using a hash table is that multiple keys can end up
+having the same hash index. To get around this problem of collisions, we used
+a chaining algorithm, which stores all of the words with a shared key in a 
+list at the particular index. Using the chaining algorithm ensured that we 
+would not have to traverse the table every time we had a collision or expand
+as frequently, saving us time and space. 
+
+Under the hood, our hash table used an array and several vectors to store our
+information. Vectors allowed us to get instaneous insertion at back and access 
+to the elements we were looking for and store multiple pieces of 
+information- all of the unique locations of a word, for example- in one place. 
+This decision was made to further reduce the amount of time and space it took 
+for our gerp program to build the index for a given directory. We also used a 
+vector of strings to store all of the paths of each file in our directory. 
+Again, this allowed us to keep these strings, which use up a lot of space, 
+in one place rather than storing them with each word, while still getting the 
+instanteous access we desired.
+
+Another data structure that we utilized was an n-ary tree to build a file 
+system tree of the input directory. Using a tree to store this information
+before building our index allowed us to create our file paths using a single 
+path string, and then have access to each file in the directory to update our 
+index. When traversing the tree to build our file paths and access these files,
+we utilized a depth-first search algorithm, where we explored every path until
+we reached a file, add the path to our file paths vector and open the file,
+and then return to the previous subdirectory to continue exploring its other
+files and subdirectories. 
+
+Testing:
+
+  In order to test our implementation defined in the hashTable class,
+  we utilized unit tests for every function defined in hashTable.cpp. Testing
+  was done in order from the most low-level and simple function to the highest
+  level functions, only relying on the correct functionality of low-level
+  functions once their functionality has been thourougly tested. Many of the
+  tests involved inserting specific input into the table and ensuring that
+  our structure of structs described above was correctly updating. Thus, many
+  tests deal with directly accessing the Bucket, Node, Wordlocations, and 
+  Instance structs to ensure that the member values and vectors were updating
+  accordingly. For example, one of our tests defined in unit_tests.h
+  inserts the uppercase versions of a word (ex. WHAT), and ensures that
+  a node corresponding to the lowercase version of the word (what) is created
+  which holds a Wordlocation entry that corresponds to the case sensitive 
+  version of the word (WHAT). Another example of a test defined in unit_tests.h 
+  inserted different casings of the word 'the' into the table 
+  ('the', 'The', 'tHe', 'thE', 'THE') and ensured that one singular 'the' Node 
+  was created with 5 different Wordlocation entries, each corresponding to a 
+  different inserted casing of the word 'the'. For an accurate description of
+  all 29 unit tests, please see the well-documented tests defined in the
+  unit_tests.h file.
+    
+  
+  To further aid with testing, we defined a function called printTable() 
+  in the hashTable class which prints out all of the contents and information
+  stored in the hash table at any given point. This allowed us to not only
+  use assert() statements but also visually compare the correct organization of
+  the tree at any given point throughout all of our tests.
+
+  For our gerp class and testing the overall program, we utilized diff testing
+  to capture a number of cases that may come up. These cases included:
+
+  Edge cases considered:
+
+    Empty directory
+    Directory that does not exist
+    Empty File
+    Inputting a word that does not exist
+    Inputting a word which solely consists of non-alphanumeric characters
+    Inputting the empty string
+    Querying multiple words at once
+
+  General test cases (confirmed with diff testing):
+    Querying the same word twice
+    Querying the same word using case sensitive and then case insensitive 
+      back-to-back
+    Querying uppercase words
+    Switching output files
+
+  These cases we tested on all three test directories- smallGutenberg, 
+  mediumGutenberg, and largeGutenberg- that were availabe. We also diff tested 
+  to ensure that the "Query? " prompt and departing message properly printed 
+  out to cout. Once we accomplish all of these tests, we finally ensured that 
+  our program followed the constraints for the time and space complexity of
+  building our index on the three directories. Once we were satisfied with
+  our program's runtime and space usage, we then ran valgrind to ensure that no
+  memory was not deallocated at the end of the program. 
+
+Hours: 30 hours

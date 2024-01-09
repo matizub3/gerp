@@ -1,0 +1,94 @@
+Mateusz Zubrzycki and Rolando Ortega
+diff_tests.txt
+12/13/2023
+
+Purpose: This file documents all diff tests that were performed to ensure
+         identical functionality between our implementation of Gerp and the
+         reference program the_gerp. All diff tests were motivated by all 
+         considered edge and general testing cases expressed in the README file.
+
+
+
+----- denotes the seperation of all diff tests. Please note that the following 
+input was separately inputted into the program using individual test input files
+through cin after compiling and running the executable ./gerp for our 
+implementation. Every single diff testing was considered using the tinyData, 
+smallGutenberg, mediumGutenberg, and largeGutenberg directories. 
+
+-----
+
+the
+@q
+
+-----
+
+@i the
+@q
+
+-----
+
+and
+@q
+
+-----
+
+@i and
+@q
+
+-----
+
+what
+@i what
+@q
+
+-----
+
+@f output.txt
+creative
+@q
+
+-----
+
+[empty file]
+
+-----
+
+[directory which does not exist]
+
+-----
+
+sfsdfshdfsdf // word which does not exist in the file
+@q
+
+-----
+
+The
+@q
+
+-----
+
+The
+The
+@q
+
+-----
+
+!@#$
+@q
+
+-----
+
+[empty string]
+
+-----
+
+The best
+@quit
+
+-----
+
+The
+the
+
+-----
+
